@@ -56,6 +56,20 @@
             cursor: pointer;
         }
 
+        #toolbar button {
+            padding: 8px 12px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #backButton,
+        #forwardButton {
+            min-width: 40px;
+        }
+
         /* Toggle arrow */
         #toggleArrow {
             position: absolute;
@@ -103,8 +117,10 @@
     <div id="main">
         <div id="toolbar-wrapper">
             <div id="toolbar">
-                <input id="urlInput" type="text" placeholder="Enter URL" />
+                <input type="text" id="urlInput" placeholder="Enter URL" />
+                <button id="backButton">⬅</button>
                 <button id="goButton">Go</button>
+                <button id="forwardButton">➡</button>
             </div>
         </div>
         <button id="toggleArrow">⬆</button>
@@ -113,6 +129,8 @@
     <script>
         const urlInput = document.getElementById('urlInput');
         const goButton = document.getElementById('goButton');
+        const backButton = document.getElementById('backButton');
+        const forwardButton = document.getElementById('forwardButton');
         const webview = document.getElementById('webview');
         const toolbarWrapper = document.getElementById('toolbar-wrapper');
         const toolbar = document.getElementById('toolbar');
@@ -142,6 +160,21 @@
                 goButton.innerText = 'Go';
             }
         }
+
+        function updateNavButtons() {
+            backButton.disabled = !webview.canGoBack();
+            forwardButton.disabled = !webview.canGoForward();
+            if (backButton.disabled) {
+                backButton.innerHTML = '<span style="color: grey;">⬅</span>';
+            } else {
+                backButton.innerHTML = '⬅'
+            }
+            if (forwardButton.disabled) {
+                forwardButton.innerHTML = '<span style="color: grey;">➡</span>';
+            } else {
+                forwardButton.innerHTML = '➡';
+            }
+        }
         const updateToolbarState = () => {
             const toolbarHeight = toolbar.scrollHeight;
             document.documentElement.style.setProperty('--toolbar-height', `${toolbarHeight}px`);
@@ -163,12 +196,20 @@
             updateToolbarState();
         });
         goButton.addEventListener('click', () => {
-            console.log(formatURL(urlInput.value));
             webview.loadURL(formatURL(urlInput.value));
+        });
+        backButton.addEventListener('click', () => {
+            if (webview.canGoBack()) {
+                webview.goBack();
+            }
+        });
+        forwardButton.addEventListener('click', () => {
+            if (webview.canGoForward()) {
+                webview.goForward();
+            }
         });
         urlInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                console.log(formatURL(urlInput.value));
                 webview.loadURL(formatURL(urlInput.value));
             }
         });
@@ -178,10 +219,13 @@
         webview.addEventListener('did-navigate', (e) => {
             urlInput.value = e.url;
             updateUrlBar(e);
+            updateNavButtons(e);
         });
         // Update on various navigation events
-        //webview.addEventListener('did-navigate', updateUrlBar);
-        webview.addEventListener('did-navigate-in-page', updateUrlBar);
+        webview.addEventListener('did-navigate-in-page', (e) => {
+            updateUrlBar(e);
+            updateNavButtons(e);
+        });
         webview.addEventListener('did-start-loading', () => {
             // Optional: show loading indicator
             setLoadingState(true);
@@ -194,6 +238,7 @@
             console.error('Failed to load:', e.errorDescription);
             setLoadingState(false);
         });
+        webview.addEventListener('dom-ready', updateNavButtons);
     </script>
 </body>
 
