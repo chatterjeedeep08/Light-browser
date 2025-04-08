@@ -1,0 +1,181 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+/* Container for toolbar AND toggle so they animate together */
+#toolbar-wrapper {
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+/* Toolbar itself */
+#toolbar {
+    display: flex;
+    padding: 10px;
+    background-color: #222;
+    gap: 10px;
+}
+
+/* Address input */
+#urlInput {
+    flex: 1;
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+}
+
+#urlInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #1e90ff;
+    /* A nice blue ring */
+}
+
+/* Go button */
+#goButton {
+    padding: 8px 12px;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#toolbar button {
+    padding: 8px 12px;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#backButton,
+#forwardButton {
+    min-width: 40px;
+}
+
+/* Toggle arrow */
+#toggleArrow {
+    position: absolute;
+    top: calc(var(--toolbar-height, 60px) - 12px);
+    right: 20px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #333;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: top 0.3s ease;
+}
+
+/* Webview stays full height minus the toolbar */
+#webview {
+    flex: 1;
+}
+
+.loader {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid white;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#menuButtonContainer {
+    position: relative;
+}
+
+#historyDropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    margin: 5px;
+}
+
+#historyDropdown.show {
+    display: block;
+}
+
+.dropdown-button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin: 5px; /* Add space between buttons */
+}
+
+.dropdown-button:hover {
+    background-color: #444;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup content */
+.popup-content {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    width: 80%;
+    max-width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Close button styling (optional) */
+.popup-close {
+    margin-top: 10px;
+    text-align: right;
+}
