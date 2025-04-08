@@ -4,10 +4,20 @@
 
 html,
 body {
+    font-family: 'Quicksand', sans-serif;
     height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: 'Quicksand', sans-serif;
 }
 
 #main {
@@ -142,7 +152,9 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin: 5px; /* Add space between buttons */
+    margin: 5px;
+    font-family: 'Quicksand', sans-serif;
+    /* Add space between buttons */
 }
 
 .dropdown-button:hover {
@@ -155,27 +167,54 @@ body {
     top: 0;
     left: 0;
     width: 100%;
+    max-width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
     z-index: 2000;
     justify-content: center;
     align-items: center;
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Popup content */
 .popup-content {
-    background-color: #222;
-    padding: 20px;
-    border-radius: 10px;
-    color: white;
-    width: 80%;
-    max-width: 400px;
-    max-height: 70vh;
-    overflow-y: auto;
+    background-color: #1e1e1e;
+    padding: 16px;
+    border-radius: 8px;
+    color: #f0f0f0;
+    width: 70%;
+    max-width: 1280px;
+    min-width: 300px;
+    min-height: 200px;
+    overflow: auto;
+    resize: both;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
 }
 
-/* Close button styling (optional) */
+/* Close button styling */
 .popup-close {
-    margin-top: 10px;
     text-align: right;
+    margin-bottom: 8px;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+#clearHistoryBtn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #f0f0f0;
+    transition: opacity 0.2s ease;
+}
+
+#clearHistoryBtn:hover {
+    opacity: 0.6;
 }

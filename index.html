@@ -8,7 +8,10 @@
 
   <div id="historyPopup" class="popup">
     <div class="popup-content">
-      <h3>History</h3>
+      <div class="popup-header">
+        <h3>History</h3>
+        <button id="clearHistoryBtn" title="Clear History">🗑️</button>
+      </div>
       <div id="historyList"></div>
     </div>
   </div>
@@ -19,7 +22,7 @@
         <div id="toolbar">
           <input type="text" id="urlInput" placeholder="Enter URL" />
           <button id="backButton">⬅</button>
-          <button id="goButton">Go</button>
+          <button id="goButton">GO</button>
           <button id="forwardButton">➡</button>
           <div id="menuButtonContainer">
             <button id="menuButton">⋮</button>
