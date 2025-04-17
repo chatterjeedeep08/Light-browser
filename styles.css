@@ -206,6 +206,21 @@ select {
     margin-bottom: 8px;
 }
 
+.popup-body{
+    flex: 1;
+    overflow-y: auto;
+    max-height: 60vh;
+    padding: 10px;
+}
+
+.popup-body::-webkit-scrollbar {
+    width: 8px;
+}
+.popup-body::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+}
+
 #clearHistoryBtn {
     background: none;
     border: none;

@@ -12,6 +12,7 @@ const historyItem = document.getElementById("historyDropdown");
 const historyPopup = document.getElementById("historyPopup");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 let isToolbarVisible = true;
+let lastInteractionWasKeyboard = false;
 
 function formatURL(url) {
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -57,104 +58,153 @@ function getHistory() {
 }
 
 function addToHistory(url, title) {
-  webview
-    .executeJavaScript(
-      `
+	webview
+		.executeJavaScript(
+			`
 		(function() {
-		  const links = document.querySelectorAll("link[rel~='icon']");
-		  if (links.length > 0) return links[0].href;
-		  return '/favicon.ico';
+			const links = document.querySelectorAll("link[rel~='icon']");
+			if (links.length > 0) return links[0].href;
+			return '/favicon.ico';
 		})();
-	  `
-    )
-    .then((icon) => {
-      const history = JSON.parse(
-        localStorage.getItem("browserHistory") || "[]"
-      );
-      if (history.length === 0 || history[history.length - 1].url !== url) {
-        history.push({ url, title, icon });
-        localStorage.setItem("browserHistory", JSON.stringify(history));
-      }
-    });
+		`
+		)
+		.then((icon) => {
+			const history = JSON.parse(
+				localStorage.getItem("browserHistory") || "[]"
+			);
+			const now = new Date();
+			const timestamp = new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate(),
+				now.getHours(),
+				now.getMinutes()
+			).toISOString(); // Remove seconds from timestamp
+			if (history.length === 0 || history[history.length - 1].url !== url) {
+				history.push({ url, title, icon, timestamp });
+				localStorage.setItem("browserHistory", JSON.stringify(history));
+			}
+		});
 }
 
 function populateHistoryPopup() {
-  const popup = document.getElementById("historyPopup");
-  const list = document.getElementById("historyList");
-  const history = getHistory();
+	const popup = document.getElementById("historyPopup");
+	const list = document.getElementById("historyList");
+	const history = getHistory();
 
-  list.innerHTML = ""; // Clear previous
+	list.innerHTML = ""; // Clear previous
 
-  if (history.length === 0) {
-    const empty = document.createElement("p");
-    empty.textContent = "No history available.";
-    empty.style.color = "#aaa";
-    empty.style.textAlign = "center";
-    empty.style.fontStyle = "italic";
-    list.appendChild(empty);
-  } else {
-    history.forEach((entry) => {
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-      row.style.flexDirection = "row";
-      row.style.alignItems = "flex-start";
-      row.style.padding = "6px";
-      row.style.gap = "4px";
-      row.style.marginBottom = "8px";
-      row.style.padding = "8px";
-      row.style.borderRadius = "4px";
-      row.style.backgroundColor = "#505050";
+	if (history.length === 0) {
+		const empty = document.createElement("p");
+		empty.textContent = "No history available.";
+		empty.style.color = "#aaa";
+		empty.style.textAlign = "center";
+		empty.style.fontStyle = "italic";
+		list.appendChild(empty);
+	} else {
+		// Group history by date
+		const groupedHistory = history.reduce((acc, entry) => {
+			const date = new Date(entry.timestamp).toLocaleDateString();
+			if (!acc[date]) acc[date] = [];
+			acc[date].push(entry);
+			return acc;
+		}, {});
 
-      const iconImg = document.createElement("img");
-      iconImg.src =
-        entry.icon ||
-        `https://www.google.com/s2/favicons?sz=64&domain_url=${
-          new URL(entry.url).origin
-        }`; // Fetch favicon from main website
-      iconImg.style.width = "14px";
-      iconImg.style.height = "14px";
-      iconImg.style.marginRight = "8px";
-      iconImg.style.marginTop = "2px"; // Align with text
-      row.prepend(iconImg);
+		Object.keys(groupedHistory).forEach((date) => {
+			// Add date header
+			const dateHeader = document.createElement("h3");
+			const formattedDate = new Date(date).toLocaleDateString("en-US", {
+				day: "2-digit",
+				month: "short",
+			}).split(" ").reverse().join(" "); // Format as DD MMM
+			dateHeader.textContent = `${formattedDate} ${new Date(date).getFullYear()}`;
+			dateHeader.style.color = "#FAFAFA";
+			dateHeader.style.margin = "10px 0";
+			dateHeader.style.fontSize = "16px";
+			dateHeader.style.borderBottom = "1px solid #aaa";
+			list.appendChild(dateHeader);
 
-      const title = document.createElement("span");
-      title.textContent = entry.title || entry.url;
-      title.style.flex = "1";
-      title.style.marginRight = "10px";
-      title.style.color = "#FAFAFA";
-      title.style.fontSize = "14px";
-      title.style.whiteSpace = "normal"; // Allow wrapping
-      title.style.overflowWrap = "break-word"; // Wrap long URLs
-      title.style.lineHeight = "1.4"; // Improve readability
-      title.style.marginBottom = "4px"; // Space from button if multiline
+			// Add rows for each entry under the date
+			groupedHistory[date].forEach((entry) => {
+				const row = document.createElement("div");
+				row.style.display = "flex";
+				row.style.justifyContent = "space-between";
+				row.style.flexDirection = "row";
+				row.style.alignItems = "flex-start";
+				row.style.padding = "6px";
+				row.style.gap = "4px";
+				row.style.marginBottom = "8px";
+				row.style.padding = "8px";
+				row.style.borderRadius = "4px";
+				row.style.backgroundColor = "#505050";
 
-      const btn = document.createElement("button");
-      btn.textContent = "Go";
-      btn.style.padding = "6px 12px";
-      btn.style.border = "none";
-      btn.style.borderRadius = "4px";
-      btn.style.backgroundColor = "#007BFF";
-      btn.style.color = "#fff";
-      btn.style.cursor = "pointer";
-      btn.style.fontSize = "14px";
-      btn.style.padding = "4px 10px";
-      btn.style.transition = "background-color 0.2s ease";
-      btn.onmouseover = () => (btn.style.backgroundColor = "#0056b3");
-      btn.onmouseout = () => (btn.style.backgroundColor = "#007BFF");
-      btn.onclick = () => {
-        webview.loadURL(entry.url);
-        popup.style.display = "none";
-        webview.focus(); // Close popup after click
-      };
+				const iconImg = document.createElement("img");
+				iconImg.src =
+					entry.icon && entry.icon !== "/favicon.ico"
+						? entry.icon
+						: `https://www.google.com/s2/favicons?sz=64&domain_url=${
+								new URL(entry.url).origin
+							}` || "https://www.google.com/favicon.ico"; // Default to Google's favicon if no icon is found
+				iconImg.style.width = "14px";
+				iconImg.style.height = "14px";
+				iconImg.style.marginRight = "8px";
+				iconImg.style.marginTop = "2px"; // Align with text
+				row.prepend(iconImg);
 
-      row.appendChild(title);
-      row.appendChild(btn);
-      list.appendChild(row);
-    });
-  }
+				const title = document.createElement("span");
+				const maxTitleLength = 50; // Limit the title length
+				const displayTitle =
+					entry.title && entry.title.length > maxTitleLength
+						? entry.title.substring(0, maxTitleLength) + "..."
+						: entry.title || entry.url;
+				title.textContent = displayTitle;
+				title.style.flex = "1";
+				title.style.marginRight = "10px";
+				title.style.color = "#FAFAFA";
+				title.style.fontSize = "14px";
+				title.style.whiteSpace = "normal"; // Allow wrapping
+				title.style.overflowWrap = "break-word"; // Wrap long URLs
+				title.style.lineHeight = "1.4"; // Improve readability
+				title.style.marginBottom = "4px"; // Space from button if multiline
 
-  popup.style.display = "flex"; // Show popup
+				const time = document.createElement("span");
+				const formattedTime = new Date(entry.timestamp).toLocaleTimeString([], {
+					hour: "2-digit",
+					minute: "2-digit",
+				}); // Format as HH:MM AM/PM
+				time.textContent = formattedTime;
+				time.style.color = "#aaa";
+				time.style.fontSize = "12px";
+				time.style.marginRight = "10px";
+
+				const btn = document.createElement("button");
+				btn.textContent = "Go";
+				btn.style.padding = "6px 12px";
+				btn.style.border = "none";
+				btn.style.borderRadius = "4px";
+				btn.style.backgroundColor = "#007BFF";
+				btn.style.color = "#fff";
+				btn.style.cursor = "pointer";
+				btn.style.fontSize = "14px";
+				btn.style.padding = "4px 10px";
+				btn.style.transition = "background-color 0.2s ease";
+				btn.onmouseover = () => (btn.style.backgroundColor = "#0056b3");
+				btn.onmouseout = () => (btn.style.backgroundColor = "#007BFF");
+				btn.onclick = () => {
+					webview.loadURL(entry.url);
+					popup.style.display = "none";
+					webview.focus(); // Close popup after click
+				};
+
+				row.prepend(time);
+				row.appendChild(title);
+				row.appendChild(btn);
+				list.appendChild(row);
+			});
+		});
+	}
+
+	popup.style.display = "flex"; // Show popup
 }
 
 const updateToolbarState = () => {
@@ -198,6 +248,13 @@ urlInput.addEventListener("keydown", (e) => {
     webview.loadURL(formatURL(urlInput.value));
   }
 });
+// Stop webview from stealing focus when interacting with URL bar
+urlInput.addEventListener("click", (e) => {
+  e.stopPropagation(); // prevent propagation to the webview layer
+});
+urlInput.addEventListener("focus", (e) => {
+  urlInput.select();
+});
 const updateUrlBar = (event) => {
   urlInput.value = event.url;
 };
@@ -206,25 +263,25 @@ menuBtn.addEventListener("click", () => {
 });
 
 historyItem.addEventListener("click", () => {
-	populateHistoryPopup();
+  populateHistoryPopup();
 });
 
 historyPopup.addEventListener("click", (e) => {
-	if (e.target.id === "historyPopup") {
-		e.target.style.display = "none";
-		webview.focus(); // Close popup when clicking outside
-	}
+  if (e.target.id === "historyPopup") {
+    e.target.style.display = "none";
+    webview.focus(); // Close popup when clicking outside
+  }
 });
 clearHistoryBtn.addEventListener("click", () => {
-	if (confirm("Clear all browsing history?")) {
-		localStorage.removeItem("browserHistory");
-		populateHistoryPopup();
-	}
+  if (confirm("Clear all browsing history?")) {
+    localStorage.removeItem("browserHistory");
+    populateHistoryPopup();
+  }
 });
 document.addEventListener("click", (e) => {
   if (!menuBtn.contains(e.target) && !historyItem.contains(e.target)) {
-	historyItem.classList.remove("show");
-	webview.focus(); // Focus webview when clicking outside
+    historyItem.classList.remove("show");
+    webview.focus(); // Focus webview when clicking outside
   }
 });
 document.addEventListener("keydown", (e) => {
