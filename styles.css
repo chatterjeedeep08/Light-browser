@@ -47,6 +47,7 @@ select {
     padding: 8px;
     border-radius: 5px;
     border: none;
+    height: 30px;
 }
 
 #urlInput:focus {
@@ -55,35 +56,38 @@ select {
     /* A nice blue ring */
 }
 
-/* Go button */
-#goButton {
-    padding: 8px 12px;
-    background-color: #555;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 #toolbar button {
     padding: 8px 12px;
-    background-color: #555;
+    height: 30px;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
 }
 
 #backButton,
 #forwardButton {
-    min-width: 40px;
+    background-color: #555;
+    width: 40px;
+}
+
+#goButton {
+    background-color: #1e90ff;
+    color: white;
+    width: 60px;
+}
+
+#menuButton{
+    background-color: #555;
+    width: 30px;
 }
 
 /* Toggle arrow */
 #toggleArrow {
     position: absolute;
-    top: calc(var(--toolbar-height, 60px) - 12px);
-    right: 20px;
+    top: calc(var(--toolbar-height, 60px));
+    left: 50%;
+    transform: translateX(-50%);
     width: 24px;
     height: 24px;
     border-radius: 50%;
@@ -104,13 +108,7 @@ select {
 }
 
 .loader {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border: 2px solid white;
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 0.8s linear infinite;
+    animation: spin 2s linear infinite;
 }
 
 @keyframes spin {
@@ -127,7 +125,8 @@ select {
     position: absolute;
     top: 50px;
     right: 0;
-    background-color: #1a1a1a;
+    width: 200px;
+    background-color: #616161e3;
     color: white;
     padding: 10px;
     border-radius: 8px;
@@ -152,9 +151,8 @@ select {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin: 5px;
+    margin: 5px auto; /* Center horizontally */
     font-family: 'Quicksand', sans-serif;
-    /* Add space between buttons */
 }
 
 .dropdown-button:hover {
@@ -232,4 +230,10 @@ select {
 
 #clearHistoryBtn:hover {
     opacity: 0.6;
+}
+
+.navButtonIcon {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
 }

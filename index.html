@@ -11,6 +11,9 @@
       <div class="popup-header">
         <h3>History</h3>
         <button id="clearHistoryBtn" title="Clear History">🗑️</button>
+        <!-- <button id="closeHistoryBtn" title="Close History">
+          <img src=".assets/close.png" style="width: 12px; height: 12px;">
+        </button> -->
       </div>
       <div class="popup-body">
         <div id="historyList"></div>
@@ -22,12 +25,24 @@
     <div id="main">
       <div id="toolbar-wrapper">
         <div id="toolbar">
+          <button id="backButton">
+            <img src="./assets/backward.png" alt="Back" class="navButtonIcon" />
+          </button>
           <input type="text" id="urlInput" placeholder="Enter URL" />
-          <button id="backButton">⬅</button>
-          <button id="goButton">GO</button>
-          <button id="forwardButton">➡</button>
+            <button id="goButton">
+            <img src="./assets/go.png" alt="Go" class="navButtonIcon" />
+            </button>
+          <button id="forwardButton">
+            <img
+              src="./assets/forward.png"
+              alt="Forward"
+              class="navButtonIcon"
+            />
+          </button>
           <div id="menuButtonContainer">
-            <button id="menuButton">⋮</button>
+            <button id="menuButton">
+              <img src="./assets/hamburgerMenu.png" alt="Menu" class="navButtonIcon" style="width: 16px; height: 16px; margin-left: -5px; margin-top: -1px;"/>
+            </button>
           </div>
         </div>
       </div>
@@ -36,7 +51,9 @@
         <!-- <button class="dropdown-button">Passwords</button> -->
         <!-- Add history items here dynamically if needed -->
       </div>
-      <button id="toggleArrow">⬆</button>
+      <button id="toggleArrow">
+        <img src="./assets/toggle-arrow.png" alt="Toggle Arrow" style="width: 16px; height: 16px;"/>
+      </button>
       <webview id="webview" src="https://www.google.com/"></webview>
     </div>
     <script src="./script.js"></script>

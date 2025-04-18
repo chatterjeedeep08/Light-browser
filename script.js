@@ -13,12 +13,13 @@ const historyPopup = document.getElementById("historyPopup");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 let isToolbarVisible = true;
 let lastInteractionWasKeyboard = false;
+let isMenuOpen = false;
 
 function formatURL(url) {
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     if (url.startsWith("www.")) {
-      url = "https://" + url;
-    } else if (url.includes(".")) {
+	url = "https://" + url;
+	} else if (/\.\w+$/.test(url)) {
       url = "https://www." + url;
     } else {
       url = "https://www.google.com/search?q=" + encodeURIComponent(url);
@@ -28,13 +29,23 @@ function formatURL(url) {
   return url;
 }
 
+function toggleMenu(toggle) {
+	historyItem.style.display = toggle ? "block" : "none";
+	menuBtn.style.transition = "transform 0.3s ease"; // Add transition for animation
+	menuBtn.style.transform = toggle ? "rotate(90deg)" : "rotate(180deg)"; // Rotate the button
+	menuBtn.innerHTML = toggle
+		? '<img src="./assets/close.png" alt="Menu" class="navButtonIcon" style="width: 12px; height: 12px; margin-left: -3px; margin-top: 1px"/>'
+		: '<img src="./assets/hamburgerMenu.png" alt="Menu" class="navButtonIcon" style="width: 16px; height: 16px; margin-left: -5px; margin-top: -1px;"/>';
+	isMenuOpen = toggle;
+	}
+
 function setLoadingState(isLoading) {
   if (isLoading) {
     goButton.disabled = true;
-    goButton.innerHTML = `<span class="loader"></span>`;
+	goButton.innerHTML = '<img src="assets/loader.png" alt="Loading" class=loader style="width: 28px; height: 28px; margin-top: -6px;">';
   } else {
     goButton.disabled = false;
-    goButton.innerText = "GO";
+	goButton.innerHTML = '<img src="assets/go.png" alt="Go" style="width: 32px; height: 32px; margin-top: -9px;">';
   }
 }
 
@@ -42,14 +53,14 @@ function updateNavButtons() {
   backButton.disabled = !webview.canGoBack();
   forwardButton.disabled = !webview.canGoForward();
   if (backButton.disabled) {
-    backButton.innerHTML = '<span style="color: grey;">⬅</span>';
+	backButton.innerHTML = '<img src="assets/backwardDisabled.png" alt="Back" style="width: 16px; height: 16px; display: block; margin: auto;">';
   } else {
-    backButton.innerHTML = "⬅";
+    backButton.innerHTML = '<img src="assets/backward.png" alt="Back" style="width: 16px; height: 16px; display: block; margin: auto;">';
   }
   if (forwardButton.disabled) {
-    forwardButton.innerHTML = '<span style="color: grey;">➡</span>';
+    forwardButton.innerHTML = '<img src="assets/forwardDisabled.png" alt="Back" style="width: 16px; height: 16px; display: block; margin: auto;">';
   } else {
-    forwardButton.innerHTML = "➡";
+    forwardButton.innerHTML = '<img src="assets/forward.png" alt="Back" style="width: 16px; height: 16px; display: block; margin: auto;">';
   }
 }
 
@@ -193,6 +204,7 @@ function populateHistoryPopup() {
 				btn.onclick = () => {
 					webview.loadURL(entry.url);
 					popup.style.display = "none";
+					toggleMenu(false);
 					webview.focus(); // Close popup after click
 				};
 
@@ -215,12 +227,12 @@ const updateToolbarState = () => {
   );
   if (isToolbarVisible) {
     toolbarWrapper.style.height = `${toolbarHeight}px`;
-    toggleArrow.innerText = "⬆";
-    toggleArrow.style.top = `${toolbarHeight - 12}px`;
+	toggleArrow.innerHTML = '<img src="assets/toggleArrowUp.png" alt="Toggle Up" style="width: 16px; height: 16px;">';
+    toggleArrow.style.top = `${toolbarHeight - 6}px`;
   } else {
     toolbarWrapper.style.height = "0px";
-    toggleArrow.innerText = "⬇";
-    toggleArrow.style.top = "-12px";
+	toggleArrow.innerHTML = '<img src="assets/toggleArrowDown.png" alt="Toggle Down" style="width: 16px; height: 16px;">';
+    toggleArrow.style.top = "-6px";
   }
 };
 toggleArrow.addEventListener("click", () => {
@@ -259,7 +271,8 @@ const updateUrlBar = (event) => {
   urlInput.value = event.url;
 };
 menuBtn.addEventListener("click", () => {
-  historyItem.classList.toggle("show");
+	isMenuOpen = !isMenuOpen; // Toggle menu state
+	toggleMenu(isMenuOpen);
 });
 
 historyItem.addEventListener("click", () => {
@@ -269,6 +282,7 @@ historyItem.addEventListener("click", () => {
 historyPopup.addEventListener("click", (e) => {
   if (e.target.id === "historyPopup") {
     e.target.style.display = "none";
+	toggleMenu(false);
     webview.focus(); // Close popup when clicking outside
   }
 });
