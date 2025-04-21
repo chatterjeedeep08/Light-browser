@@ -200,8 +200,14 @@ select {
 .popup-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     margin-bottom: 8px;
+}
+
+.popup-header h3 {
+    margin: 10px;
+    font-size: 20px;
+    color: #f0f0f0;
+    text-align: left;
 }
 
 .popup-body{
@@ -219,7 +225,15 @@ select {
     border-radius: 4px;
 }
 
+.history-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+}
+
 #clearHistoryBtn {
+    margin-right: 20px;
     background: none;
     border: none;
     font-size: 16px;
@@ -229,6 +243,20 @@ select {
 }
 
 #clearHistoryBtn:hover {
+    opacity: 0.6;
+}
+
+#closeHistoryBtn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #f0f0f0;
+    transition: opacity 0.2s ease;
+    margin-top: 5px;
+}
+
+#closeHistoryBtn:hover {
     opacity: 0.6;
 }
 
